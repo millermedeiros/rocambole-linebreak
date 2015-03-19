@@ -1,6 +1,6 @@
 {
   "name": "rocambole-linebreak",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "helpers for rocambole AST line break manipulation",
   "main": "rocambole-linebreak.js",
   "scripts": {
