@@ -100,7 +100,7 @@ function getExpect(location, typeOrValue) {
 }
 
 
-function limitInBetween(location, start, end, expected) {
+function limitInBetween(location, start, end, expected, isEof) {
   var n = getDiff(start, end, expected);
   debugBetween('diff: %d', n);
   if (n) {
@@ -109,7 +109,7 @@ function limitInBetween(location, start, end, expected) {
   if (n < 0) {
     _tk.removeInBetween(start, end, function(token) {
       return token.type === 'LineBreak' && n++ < 0 &&
-        !siblingIsComment(location, token);
+        (isEof || !siblingIsComment(token));
     });
   } else if (n > 0) {
     var target = location === 'after' ? start : end;
@@ -124,9 +124,9 @@ function limitInBetween(location, start, end, expected) {
 }
 
 
-function siblingIsComment(location, token) {
-  var prop = location === 'before' ? 'prev' : 'next';
-  return _tk.isComment(token[prop]);
+function siblingIsComment(token) {
+  return _tk.isComment(_tk.findPrev(token, _tk.isNotEmpty)) ||
+    _tk.isComment(_tk.findNext(token, _tk.isNotEmpty));
 }
 
 
@@ -208,7 +208,7 @@ exports.limitBeforeEndOfFile = function(ast, amount) {
     ast.endToken;
 
   if (lastNonEmpty) {
-    limitInBetween('after', lastNonEmpty, null, expected);
+    limitInBetween('after', lastNonEmpty, null, expected, true);
   } else {
     do {
       var br = {
